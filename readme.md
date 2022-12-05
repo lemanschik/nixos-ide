@@ -1,6 +1,16 @@
-# nixos-ide
+# deprecated nixos-ide
 
-edit nixos configuration in a graphical interface includes extensions. is based on code-oss 
+will throw that directly into the poc of cscode under packages/launch so code-oss/packages/launch/launch.js
+
+the nix parser gets added as extra module in a extra repo later i do anyway a poc with a node repl that is then the same with the nix repl 
+
+once i got a test system with nix i will address that fast it will not take long
+
+
+edit nixos co
+
+
+nfiguration in a graphical interface includes extensions. is based on code-oss 
 
 ```
 nix-shell
