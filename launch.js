@@ -1,5 +1,5 @@
 // @ts-check
-// above inits typescript bridge to JSDOC Annotations and type comments for IDE Support.
+// above inits typescript bridge to JSDOC Annotations and type comments for IDE Support. makes JS the better typescript by default.
 const html6 = `<!DOCTYPE html>
 <html lang="en" type="module">
 <head>
