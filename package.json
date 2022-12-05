@@ -1,1 +1,5 @@
-{ "name": "nixos-ide", "version": "0.0.0-beta.0", "main": "./launch.js", "type": "module" }
+{ "name": "nixos-ide", "version": "0.0.0-beta.0", "main": "./launch.js", "type": "module", "dependencies": {
+  "puppeteer-core": "npm:puppeteer-core@latest",  
+  "tree-sitter": "npm:tree-sitter@latest",
+  "tree-sitter-nix": "github:cstrahan/tree-sitter-nix"
+}}
