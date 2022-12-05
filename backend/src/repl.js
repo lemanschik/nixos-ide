@@ -72,17 +72,29 @@ const myWriter = (output) =>  output.toUpperCase();
 //console.log(`nixReplProcess: exit code ${code} signal ${signal}`);
 //console.log(`nixReplProcess: error ${error}`);
 //name: 'xterm-color', cols: 80, rows: 40, //cwd: process.env.HOME, env: nixReplEnv,
-    
-connections.push((await import('node:net')).createServer((socket) => {
+  
+const httpRepl = (req,res)  => req.pipe(repl.start()).pipe(res);
+
+const http = require('node:http');
 // repl.start({ prompt: 'Node.js via stdin> ', input: process.stdin,  output: process.stdout });
-  repl.start({
-    prompt: 'Node.js via Unix socket> ',
-    input: socket,
-    output: socket,
-  }).on('exit', () => {
-    socket.end();
-  });
-}).listen('/tmp/node-repl-sock'));
+const input = new ReadableStream({
+    start(controller) {
+        const httpServer = http.createServer(
+            (req, res) => controller.enqueue([req,res])
+        ).listen(app.port);
+        const unixSocket(await import('node:net')).createServer((socket) => {
+          repl.start({
+            prompt: 'Node.js via Unix socket> ',
+            input: socket, output: socket,
+          }).on('exit', socket.end);
+        }).listen('/tmp/node-repl-sock')
+    }
+})
+
+
+
+
+connections.push();
    
     try {
   function handleInit(data) {
