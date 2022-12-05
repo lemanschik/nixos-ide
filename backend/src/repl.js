@@ -3,40 +3,35 @@
 // C String new line terminated 
 // found https://github.com/edolstra/nix-repl/blob/master/nix-repl.cc
 
-/*
-    while (true) {
-        // When continuing input from previous lines, don't print a prompt, just align to the same
-        // number of chars as the prompt.
-        const char * prompt = input.empty() ? "nix-repl> " : "          ";
-        if (!getLine(input, prompt)) {
-            std::cout << std::endl;
-            break;
-        }
-
-        try {
-            if (!removeWhitespace(input).empty() && !processLine(input)) return;
-        } catch (ParseError & e) {
-            if (e.msg().find("unexpected $end") != std::string::npos) {
-                // For parse errors on incomplete input, we continue waiting for the next line of
-                // input without clearing the input so far.
-                continue;
-            } else {
-              printMsg(lvlError, format(error + "%1%%2%") % (settings.showTrace ? e.prefix() : "") % e.msg());
-            }
-        } catch (Error & e) {
-            printMsg(lvlError, format(error + "%1%%2%") % (settings.showTrace ? e.prefix() : "") % e.msg());
-        } catch (Interrupted & e) {
-            printMsg(lvlError, format(error + "%1%%2%") % (settings.showTrace ? e.prefix() : "") % e.msg());
-        }
-
-        // We handled the current input fully, so we should clear it and read brand new input.
-        input.clear();
+/* while (true) {
+    // When continuing input from previous lines, don't print a prompt, just align to the same
+    // number of chars as the prompt.
+    const char * prompt = input.empty() ? "nix-repl> " : "          ";
+    if (!getLine(input, prompt)) {
         std::cout << std::endl;
+        break;
     }
 
+    try {
+        if (!removeWhitespace(input).empty() && !processLine(input)) return;
+    } catch (ParseError & e) {
+        if (e.msg().find("unexpected $end") != std::string::npos) {
+            // For parse errors on incomplete input, we continue waiting for the next line of
+            // input without clearing the input so far.
+            continue;
+        } else {
+          printMsg(lvlError, format(error + "%1%%2%") % (settings.showTrace ? e.prefix() : "") % e.msg());
+        }
+    } catch (Error & e) {
+        printMsg(lvlError, format(error + "%1%%2%") % (settings.showTrace ? e.prefix() : "") % e.msg());
+    } catch (Interrupted & e) {
+        printMsg(lvlError, format(error + "%1%%2%") % (settings.showTrace ? e.prefix() : "") % e.msg());
+    }
 
-
-*/
+    // We handled the current input fully, so we should clear it and read brand new input.
+    input.clear();
+    std::cout << std::endl;
+} */
 
 
 // Looks compatible
@@ -48,23 +43,21 @@ FIXME this breaks on parallel requests
 https://stackoverflow.com/questions/22107144/node-js-express-and-parallel-queues
 */
 
+//const port = app.settings.port;
 
+const nixReplEnv = { ...process.env };
+// TODO: This does not look efficent i need to look how the original string looks like.
+const nixPath = Object.fromEntries(
+    (process.env.NIX_PATH || '')
+        .split(':').map((kv)=>kv.split('=')).map(([key, value]) => [
+          value ? key : '', 
+          value?.join('=') || key
+        ]);
+);
+console.log({ nixPath });
+console.log(`info: nixos-config: ${(nixReplEnv.NIXOS_CONFIG = nixPath['nixos-config'] || '/etc/nixos/configuration.nix')}`);
 
-
-  const port = app.settings.port;
-
-  // start nix repl
-
-  const nixReplEnv = { ...process.env };
-
-  const nixPath = Object.fromEntries((process.env.NIX_PATH || '').split(':').map(kv => {
-    const parts = kv.split('=');
-    return parts.length == 1 ? ['', parts[0]] : [parts[0], parts.slice(1).join('=')];
-  }));
-  console.log({ nixPath });
-  console.log(`info: nixos-config: ${(nixReplEnv.NIXOS_CONFIG = nixPath['nixos-config'] || '/etc/nixos/configuration.nix')}`);
-
-let connections = 0;
+const connections = [];
 const repl = await import('node:repl');
 const myEval = (cmd, context, filename, callback) =>
   callback(null, cmd);
@@ -72,17 +65,13 @@ const myWriter = (output) =>  output.toUpperCase();
     
 // add some transfom streams do not want to waist to much time now 
 // eval: myEval, writer: myWriter useColor: true
-repl.start({ prompt: 'Node.js via stdin> ',
-  input: process.stdin,
-  output: process.stdout,
-});
-    // .spawn('nix', ['repl', '<nixpkgs/nixos>'],
-    //console.log(`nixReplProcess: exit code ${code} signal ${signal}`);
-    //console.log(`nixReplProcess: error ${error}`);
-    //name: 'xterm-color', cols: 80, rows: 40, //cwd: process.env.HOME, env: nixReplEnv,
+// .spawn('nix', ['repl', '<nixpkgs/nixos>'],
+//console.log(`nixReplProcess: exit code ${code} signal ${signal}`);
+//console.log(`nixReplProcess: error ${error}`);
+//name: 'xterm-color', cols: 80, rows: 40, //cwd: process.env.HOME, env: nixReplEnv,
     
-(await import('node:net')).createServer((socket) => {
-  connections += 1;
+connections.push((await import('node:net')).createServer((socket) => {
+// repl.start({ prompt: 'Node.js via stdin> ', input: process.stdin,  output: process.stdout });
   repl.start({
     prompt: 'Node.js via Unix socket> ',
     input: socket,
@@ -90,7 +79,7 @@ repl.start({ prompt: 'Node.js via stdin> ',
   }).on('exit', () => {
     socket.end();
   });
-}).listen('/tmp/node-repl-sock');
+}).listen('/tmp/node-repl-sock'));
    
     try {
   function handleInit(data) {
