@@ -1,3 +1,6 @@
+// I guess he wants browser request => repl in => repl out => response. via get query parm of a url on /repl
+
+
 // I guess this should some how link the process shell to a other process shell node-pty is using the network.
 // i do not know what nix repl is exactly but maybe it returns UTF 8 as it is a console app it should be 
 // C String new line terminated 
