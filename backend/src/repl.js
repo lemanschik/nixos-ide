@@ -62,20 +62,11 @@ module.exports = function addToApp(app) {
 
   const nixPath = Object.fromEntries((process.env.NIX_PATH || '').split(':').map(kv => {
     const parts = kv.split('=');
-    if (parts.length == 1) {
-      return ['', parts[0]];
-    }
-    else {
-      return [parts[0], parts.slice(1).join('=')];
-    }
+    return parts.length == 1 ? ['', parts[0]] : [parts[0], parts.slice(1).join('=')];
   }));
-  console.dir({ nixPath }); // debug
+  console.log({ nixPath });
+  console.log(`info: nixos-config: ${(nixReplEnv.NIXOS_CONFIG = nixPath['nixos-config'] || '/etc/nixos/configuration.nix')}`);
 
-  if (!nixPath['nixos-config']) {
-    // workaround for missing nixos-config in $NIX_PATH
-    nixReplEnv.NIXOS_CONFIG = '/etc/nixos/configuration.nix';
-    console.log(`info: nixos-config is missing in $NIX_PATH. using default value ${nixReplEnv.NIXOS_CONFIG}`);
-  }
 let connections = 0;
 const repl = await import('node:repl');
 const myEval = (cmd, context, filename, callback) =>
@@ -104,6 +95,7 @@ repl.start({ prompt: 'Node.js via stdin> ',
   });
 }).listen('/tmp/node-repl-sock');
    
+    try {
   function handleInit(data) {
     
     // prompt is ready
@@ -126,14 +118,13 @@ repl.start({ prompt: 'Node.js via stdin> ',
 
     //console.dir({replResponseHandler: { data }});
 
-    if (initDone) {
+// set nixPath env
 
       replResponseBuffer.push(data);
 
       if (data.endsWith('nix-repl> ')) {
-        // end of response
         // TODO better. avoid false matches
-
+        //   here he implements something
         if (queryStack.length == 0) {
           console.log(`no response handler -> ignore repl response`);
           replResponseBuffer = [];
@@ -161,12 +152,14 @@ repl.start({ prompt: 'Node.js via stdin> ',
           bodyJson = ''
           // TODO send http status != 200
         }
-        const bodyJsonStart = bodyJson.length < 80 ? bodyJson : `${bodyJson.slice(0, 76)} ...`;
+          
+          
+        //const bodyJsonStart = bodyJson.length < 80 ? bodyJson : `${bodyJson.slice(0, 76)} ...`;
         console.log(`> ${query.clientQuery}`)
         console.log(bodyJsonStart)
         console.log();
         //console.dir({ bodyJson });
-        query.sendResponse(bodyJson);
+        //query.sendResponse(bodyJson);
         // TODO better? remove the onData listener
         //nixReplProcess.removeListener("data", replResponseHandler);
         //nixReplProcess.onData(replDefaultHandler);
@@ -200,3 +193,4 @@ repl.start({ prompt: 'Node.js via stdin> ',
     nixReplProcess.write(`${clientQuery}\r`);
   });
 }
+} catch (e) { /** NoOp */ }
