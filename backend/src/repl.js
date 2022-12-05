@@ -76,54 +76,43 @@ module.exports = function addToApp(app) {
     nixReplEnv.NIXOS_CONFIG = '/etc/nixos/configuration.nix';
     console.log(`info: nixos-config is missing in $NIX_PATH. using default value ${nixReplEnv.NIXOS_CONFIG}`);
   }
-
-  const nixReplProcess = pseudoTerminal.spawn('nix', ['repl', '<nixpkgs/nixos>'], {
-    name: 'xterm-color',
-    cols: 80,
-    rows: 40,
-    //cwd: process.env.HOME,
-    env: nixReplEnv,
+let connections = 0;
+const repl = await import('node:repl');
+const myEval = (cmd, context, filename, callback) =>
+  callback(null, cmd);
+const myWriter = (output) =>  output.toUpperCase();
+    
+// add some transfom streams do not want to waist to much time now 
+// eval: myEval, writer: myWriter useColor: true
+repl.start({ prompt: 'Node.js via stdin> ',
+  input: process.stdin,
+  output: process.stdout,
+});
+    // .spawn('nix', ['repl', '<nixpkgs/nixos>'],
+    //console.log(`nixReplProcess: exit code ${code} signal ${signal}`);
+    //console.log(`nixReplProcess: error ${error}`);
+    //name: 'xterm-color', cols: 80, rows: 40, //cwd: process.env.HOME, env: nixReplEnv,
+    
+(await import('node:net')).createServer((socket) => {
+  connections += 1;
+  repl.start({
+    prompt: 'Node.js via Unix socket> ',
+    input: socket,
+    output: socket,
+  }).on('exit', () => {
+    socket.end();
   });
-
-  nixReplProcess.onExit((code, signal) => {
-    console.log(`nixReplProcess: exit code ${code} signal ${signal}`);
-  });
-
-  nixReplProcess.on("error", (error) => {
-    console.log(`nixReplProcess: error ${error}`);
-  });
-
-
-
-  // init nix repl
-
-  let initStage = 0;
-  let initDone = false;
-
+}).listen('/tmp/node-repl-sock');
+   
   function handleInit(data) {
+    
+    // prompt is ready
+    //process.stdout.write(`loading the config object to cache for faster access ... `)
+    //nixReplProcess.write('builtins.attrNames config\r');
+    console.log(`repl init done\ndone\n\ntry this:\ncurl http://localhost:${port}/repl --get --data-urlencode 'q=builtins.toJSON (builtins.attrNames options)'\n`)
+    //nixReplProcess.removeListener("data", replResponseHandler); // not working
+    //nixReplProcess.onData(replDefaultHandler);
 
-    if (data.endsWith('nix-repl> ')) {
-      // prompt is ready
-      if (initStage == 0) {
-        process.stdout.write(`loading the config object to cache for faster access ... `)
-        nixReplProcess.write('builtins.attrNames config\r');
-        initStage = 1;
-      }
-      else
-      if (initStage == 1) {
-        // received response from initStage 0
-        //console.log(`initStage ${initStage}`)
-        //nixReplProcess.write('builtins.attrNames config\r');
-        initStage = 2;
-        initDone = true;
-        //console.log('repl init done');
-        console.log('done')
-        console.log();
-        console.log(`try this:\ncurl http://localhost:${port}/repl --get --data-urlencode 'q=builtins.toJSON (builtins.attrNames options)'\n`)
-        //nixReplProcess.removeListener("data", replResponseHandler); // not working
-        //nixReplProcess.onData(replDefaultHandler);
-      }
-    }
   }
 
 
