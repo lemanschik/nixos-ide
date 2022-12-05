@@ -2,6 +2,12 @@
 
 edit nixos configuration in a graphical interface includes extensions. is based on code-oss 
 
+```
+nix-shell
+npm install
+node -e `import('./launch.js')`
+```
+
 ## status
 
 proof of concept
