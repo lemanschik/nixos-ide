@@ -1,3 +1,5 @@
+// @ts-check
+// above inits typescript bridge to JSDOC Annotations and type comments for IDE Support.
 const html6 = `<!DOCTYPE html>
 <html lang="en" type="module">
 <head>
