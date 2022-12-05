@@ -1,8 +1,6 @@
-# nixos-config-webui
+# nixos-ide
 
-web editor for nix files
-
-edit nixos configuration in a graphical webinterface
+edit nixos configuration in a graphical interface includes extensions.
 
 ## status
 
@@ -10,7 +8,9 @@ proof of concept
 
 ## todo
 
-* prototype an **incremental** nix evaluator for [rnix-lsp](https://github.com/nix-community/rnix-lsp/issues/41)
+* prototype an **incremental** nix evaluator for 
+- [x] [rnix-es](https://github.com/nix-community/rnix-lsp/issues/41)
+
 
 ## concept
 
@@ -37,7 +37,8 @@ this project is based on
 * [solidjs-resizable-splitter-component](https://github.com/milahu/solidjs-resizable-splitter-component)
 * [solidjs-monaco-editor-component](https://github.com/milahu/solidjs-monaco-editor-component)
 
-todo: also support [tree-sitter](https://github.com/tree-sitter/tree-sitter) parsers for WASM browsers
+todo: 
+- [ ] [tree-sitter](https://github.com/tree-sitter/tree-sitter) parsers for WASM browsers
 
 * [tree-sitter-nix](https://github.com/cstrahan/tree-sitter-nix) - nix parser in WASM
 * [monaco-tree-sitter](https://github.com/milahu/monaco-tree-sitter) - integration for monaco-editor and tree-sitter
