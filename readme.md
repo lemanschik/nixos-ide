@@ -1,6 +1,6 @@
 # nixos-ide
 
-edit nixos configuration in a graphical interface includes extensions.
+edit nixos configuration in a graphical interface includes extensions. is based on code-oss 
 
 ## status
 
