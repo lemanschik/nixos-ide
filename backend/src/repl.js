@@ -48,11 +48,8 @@ FIXME this breaks on parallel requests
 https://stackoverflow.com/questions/22107144/node-js-express-and-parallel-queues
 */
 
-const pseudoTerminal = require('node-pty');
 
 
-
-module.exports = function addToApp(app) {
 
   const port = app.settings.port;
 
@@ -114,7 +111,7 @@ repl.start({ prompt: 'Node.js via stdin> ',
   let replResponseBuffer = [];
   const queryStack = [];
 
-  nixReplProcess.onData(function replResponseHandler(data) {
+  nixReplProcess.onData((data) => {
 
     //console.dir({replResponseHandler: { data }});
 
@@ -165,32 +162,15 @@ repl.start({ prompt: 'Node.js via stdin> ',
         //nixReplProcess.onData(replDefaultHandler);
       }
     }
-    else {
-      handleInit(data);
-    }
+    else {  handleInit(data);  }
   });
 
-
-
+  // wants to handle json at /repl via query parms as get request something unsave in general not clever
   app.get('/repl', async function(req, res) {
-
     const clientQuery = req.query.q;
-    //console.dir({ clientQuery });
-    if (!clientQuery) {
-      res.send("");
-      return;
-    }
-
-    // TODO limit query to one line (debounce, rate limit)
-
-    queryStack.push({
-      clientQuery,
-      sendResponse: function sendResponse(data) {
-        res.send(data);
-      },
-    });
-
+    if (!clientQuery) { res.send("");   return;   }
+    queryStack.push({ clientQuery, sendResponse: (data) => res.send(data) });
     nixReplProcess.write(`${clientQuery}\r`);
   });
-}
+
 } catch (e) { /** NoOp */ }
