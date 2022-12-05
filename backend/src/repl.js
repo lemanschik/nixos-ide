@@ -4,6 +4,45 @@
 // found https://github.com/edolstra/nix-repl/blob/master/nix-repl.cc
 
 /*
+    while (true) {
+        // When continuing input from previous lines, don't print a prompt, just align to the same
+        // number of chars as the prompt.
+        const char * prompt = input.empty() ? "nix-repl> " : "          ";
+        if (!getLine(input, prompt)) {
+            std::cout << std::endl;
+            break;
+        }
+
+        try {
+            if (!removeWhitespace(input).empty() && !processLine(input)) return;
+        } catch (ParseError & e) {
+            if (e.msg().find("unexpected $end") != std::string::npos) {
+                // For parse errors on incomplete input, we continue waiting for the next line of
+                // input without clearing the input so far.
+                continue;
+            } else {
+              printMsg(lvlError, format(error + "%1%%2%") % (settings.showTrace ? e.prefix() : "") % e.msg());
+            }
+        } catch (Error & e) {
+            printMsg(lvlError, format(error + "%1%%2%") % (settings.showTrace ? e.prefix() : "") % e.msg());
+        } catch (Interrupted & e) {
+            printMsg(lvlError, format(error + "%1%%2%") % (settings.showTrace ? e.prefix() : "") % e.msg());
+        }
+
+        // We handled the current input fully, so we should clear it and read brand new input.
+        input.clear();
+        std::cout << std::endl;
+    }
+
+
+
+*/
+
+
+// Looks compatible
+
+
+/*
 FIXME this breaks on parallel requests
 -> the requests hang forever
 https://stackoverflow.com/questions/22107144/node-js-express-and-parallel-queues
